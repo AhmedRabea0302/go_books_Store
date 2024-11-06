@@ -79,8 +79,29 @@ func (r Repository) CreateBook(ctx *fiber.Ctx) error {
 }
 
 func (r Repository) DeleteBook(ctx *fiber.Ctx) error {
-	return nil
+	book := models.Books{}
+	id := ctx.Params("id")
+	if id == "" {
+		ctx.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"message": "Missing book ID",
+		})
+		return nil
+	}
 
+	err := r.DB.Delete(book, id)
+
+	if err != nil {
+		ctx.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"message": "Couldn't delete book",
+		})
+		return err.Error
+	}
+
+	ctx.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"message": "Book has been deleted",
+	})
+
+	return nil
 }
 func main() {
 	err := godotenv.Load(".env")
