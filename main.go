@@ -2,8 +2,10 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/AhmedRabea0302/fiber-postgres/models"
+	"github.com/AhmedRabea0302/fiber-postgres/storage"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
@@ -84,6 +86,15 @@ func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	config := &storage.Config{
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		Password: os.Getenv("DB_PASSWORD"),
+		User:     os.Getenv("DB_USER"),
+		DBName:   os.Getenv("DB_NAME"),
+		SSLMode:  true, // change to false if you're not using SSL
 	}
 
 	db, err := storage.NewConnection(config)
