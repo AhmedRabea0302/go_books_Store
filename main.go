@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/AhmedRabea0302/fiber-postgres/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
@@ -34,8 +35,20 @@ func (r Repository) GetBookByID(ctx *fiber.Ctx) error {
 }
 
 func (r Repository) GetBooks(ctx *fiber.Ctx) error {
-	return nil
+	books := &[]models.Books{}
+	err := r.DB.Find(books).Error
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"message": "Error fetching books",
+		})
+	}
 
+	ctx.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"message": "Books fetched successfully",
+		"data":    books,
+	})
+
+	return nil
 }
 
 func (r Repository) CreateBook(ctx *fiber.Ctx) error {
