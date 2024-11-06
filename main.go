@@ -39,8 +39,28 @@ func (r Repository) GetBooks(ctx *fiber.Ctx) error {
 }
 
 func (r Repository) CreateBook(ctx *fiber.Ctx) error {
-	return nil
+	book := Book{}
 
+	err := ctx.BodyParser(&book)
+	if err != nil {
+		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(&fiber.Map{
+			"message": "Error parsing JSON",
+		})
+	}
+
+	err = r.DB.Create(&book).Error
+	if err != nil {
+		ctx.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"message": "Couldn't Create Book",
+		})
+		return err
+	}
+
+	ctx.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"message": "Book has been created",
+	})
+
+	return nil
 }
 
 func (r Repository) DeleteBook(ctx *fiber.Ctx) error {
