@@ -23,7 +23,7 @@ func NewConnection(config *Config) (*gorm.DB, error) {
 		config.DBName, config.SSLMode,
 	)
 
-	db, err := gorm.Open(postgres.Open(dsn, &gorm.Config{}))
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}

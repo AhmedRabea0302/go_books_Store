@@ -33,6 +33,27 @@ func (r Repository) SetupRputes(app *fiber.App) {
 
 // Get Book By ID
 func (r Repository) GetBookByID(ctx *fiber.Ctx) error {
+
+	id := ctx.Params("id")
+	if id == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"message": "ID is required",
+		})
+	}
+
+	book := &models.Books{}
+	err := r.DB.Where("id =?", id).First(book).Error
+	if err != nil {
+		return ctx.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"message": "Book not found",
+		})
+	}
+
+	ctx.Status(fiber.StatusOK).JSON(&fiber.Map{
+		"message": "Book fetched successfully",
+		"data":    book,
+	})
+
 	return nil
 }
 
@@ -121,6 +142,11 @@ func main() {
 	db, err := storage.NewConnection(config)
 	if err != nil {
 		log.Fatal("Couldn't connect to DB", err)
+	}
+
+	err = models.MigrateBooks(db)
+	if err != nil {
+		log.Fatal("Couldn't migrate books", err)
 	}
 
 	r := Repository{
